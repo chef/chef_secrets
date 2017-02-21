@@ -14,7 +14,7 @@
 %%%===================================================================
 read(Config) ->
     SecretsFile = proplists:get_value(secrets_file, Config),
-    lager:info("chef_secrets: Reading secrets from ~s", [SecretsFile]),
+    lager:info("Reading secrets from ~s", [SecretsFile]),
     {ok, ContentBin} = file:read_file(SecretsFile),
     SecretsEjson = jiffy:decode(ContentBin),
     {ok, SecretsEjson}.

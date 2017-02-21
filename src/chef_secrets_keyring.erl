@@ -38,8 +38,14 @@ init(Config) ->
                 secrets_data = Secrets}}.
 
 handle_call({get, Name}, _From, #state{secrets_data = Secrets} = State) ->
-    Secret = ej:get([Name], Secrets),
-    {reply, {ok, Secret}, State};
+    Reply = case ej:get([Name], Secrets) of
+              undefined ->
+                lager:warning("Could not find secret ~s", [Name]),
+                {error, not_found};
+              Secret ->
+                {ok, Secret}
+            end,
+    {reply, Reply, State};
 handle_call(_Msg, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.

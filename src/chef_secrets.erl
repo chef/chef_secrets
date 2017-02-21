@@ -2,5 +2,4 @@
 -export([get/1]).
 
 get(Name) ->
-    %% chef_secrets_keyring_provider:get(Name).
-    ok.
+    chef_secrets_keyring:get(Name).

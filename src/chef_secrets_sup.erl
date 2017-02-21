@@ -28,7 +28,11 @@ start_link() ->
 
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
-    {ok, { {one_for_all, 0, 1}, []} }.
+    {ok, Provider} = application:get_env(chef_secrets, provider),
+    {ok, ProviderOpts} = application:get_env(chef_secrets, provider_config),
+    ChildSpec = {chef_secrets_keyring, {Provider, start_link, [ProviderOpts]},
+                 permanent, brutal_kill, worker, [Provider]},
+    {ok, { {one_for_one, 5, 10}, [ChildSpec]} }.
 
 %%====================================================================
 %% Internal functions

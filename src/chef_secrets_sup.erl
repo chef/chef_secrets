@@ -26,12 +26,16 @@ start_link() ->
 
 %% ChildSpec :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
-    {ok, Provider} = application:get_env(chef_secrets, provider),
-    {ok, ProviderOpts} = application:get_env(chef_secrets, provider_config),
-    Config = [{provider, Provider} | ProviderOpts],
+    Config = get_config(),
     ChildSpec = {chef_secrets_keyring, {chef_secrets_keyring, start_link, [Config]},
                  permanent, brutal_kill, worker, [chef_secrets_keyring, chef_secrets_json_file]},
     {ok, { {one_for_one, 5, 10}, [ChildSpec]} }.
+
+get_config() ->
+    %% TODO(sr): get mocking sorted out for tests
+    Provider = application:get_env(chef_secrets, provider, chef_secrets_mock),
+    ProviderOpts = application:get_env(chef_secrets, provider_config, []),
+    [{provider, Provider} | ProviderOpts].
 
 %%====================================================================
 %% Internal functions

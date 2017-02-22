@@ -9,7 +9,9 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/1, get/1]).
+-export([start_link/1,
+         dump/0,
+         get/1]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -27,6 +29,9 @@ start_link(Config) ->
 
 get(Name) when is_binary(Name) ->
     gen_server:call(?MODULE, {get, Name}).
+
+dump() ->
+    gen_server:call(?MODULE, dump).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -46,6 +51,8 @@ handle_call({get, Name}, _From, #state{secrets_data = Secrets} = State) ->
                 {ok, Secret}
             end,
     {reply, Reply, State};
+handle_call(dump, _From, State = #state{secrets_data = Secrets}) ->
+    {reply, Secrets, State};
 handle_call(_Msg, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.

@@ -9,7 +9,7 @@
 %% Helper Functions
 %%
 secrets_file_path(Name) ->
-    TestFilePath = filename:join(code:priv_dir(chef_secrets), "../test/", Name).
+    filename:join([code:priv_dir(chef_secrets), "../test/", Name]).
 
 setup_application(SecretsFileName) ->
     Config = [ {other, foo},
@@ -17,7 +17,6 @@ setup_application(SecretsFileName) ->
     application:set_env(chef_secrets, provider, chef_secrets_json_file),
     application:set_env(chef_secrets, provider_config, Config),
     application:ensure_all_started(chef_secrets).
-
 
 %%
 %% Tests

@@ -1,6 +1,4 @@
 REBAR = $(CURDIR)/rebar3
 
 travis:
-	$(REBAR) eunit
-
-
+	$(REBAR) do eunit, dialyzer

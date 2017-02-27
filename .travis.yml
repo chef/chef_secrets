@@ -2,12 +2,18 @@ sudo: false
 branches:
   only:
     - master
+
 language: erlang
 otp_release:
   - 19.1
   - 18.3
   - 17.4
   - R16B03-1
+script: make travis
 
-script:
-  - make travis
+matrix:
+  include:
+    - language: ruby
+      otp_release:
+      rvm: 2.2.6
+      script: bundle exec rake spec

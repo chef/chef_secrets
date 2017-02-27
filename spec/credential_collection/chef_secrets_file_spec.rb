@@ -1,9 +1,12 @@
 require "spec_helper"
 require "tempfile"
+require 'stringio'
 
 describe Veil::CredentialCollection::ChefSecretsFile do
   let(:hasher) { Veil::Hasher.create }
-  let(:file) { Tempfile.new("private_chef_secrets.json") }
+  let!(:file) { Tempfile.new("private_chef_secrets.json") }
+  let(:user) {"opscode" }
+  let(:group) {"opscode" }
   let(:content) do
     {
       "veil" => {
@@ -77,6 +80,21 @@ describe Veil::CredentialCollection::ChefSecretsFile do
 
       expect(new_creds["redis_lb"]["password"].value).to eq(creds["redis_lb"]["password"].value)
       expect(new_creds["postgresql"]["sql_ro_password"].value).to eq(creds["postgresql"]["sql_ro_password"].value)
+    end
+
+    let(:tmpfile) { StringIO.new }
+
+    it "gives the file proper permissions" do
+      expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
+      allow(tmpfile).to receive(:path).and_return("/tmp/unguessable")
+      expect(FileUtils).to receive(:chown).with(user, group, "/tmp/unguessable")
+      expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
+
+      creds = described_class.new(path: file.path,
+                                  user: user,
+                                  group: group)
+      creds.add("redis_lb", "password")
+      creds.save
     end
 
     it "saves the version number" do

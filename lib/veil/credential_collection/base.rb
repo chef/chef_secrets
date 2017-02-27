@@ -49,6 +49,42 @@ module Veil
         end
       end
 
+      #
+      # Retrieves a credential from the credential store:
+      #
+      #  get(name)
+      #  get(group, name)
+      #
+      def get(*args)
+        case args.length
+        when 1
+          cred_name = args[0]
+          c = credentials[cred_name]
+          if c.nil?
+            raise Veil::CredentialNotFound, "Credential '#{cred_name}' not found."
+          else
+            c.value
+          end
+        when 2
+          group_name = args[0]
+          cred_name = args[1]
+
+          g = credentials[args[0]]
+          if g.nil?
+            raise Veil::GroupNotFound, "Credential group '#{group_name}' not found."
+          else
+            c = g[args[1]]
+            if c.nil?
+              raise Veil::CredentialNotFound, "Credential '#{cred_name}' not found in group '#{group_name}'."
+            else
+              c.value
+            end
+          end
+        else
+          raise ArgumentError, "wrong number of arguments (given #{args.length}, expected 1 or 2)"
+        end
+      end
+
       # Add a new credential to the credentials
       #
       # @param [Hash] args

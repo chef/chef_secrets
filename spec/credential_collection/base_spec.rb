@@ -44,6 +44,37 @@ describe Veil::CredentialCollection::Base do
     end
   end
 
+  describe "#get" do
+    before do
+      subject.add("testkey0", value: "testvalue0")
+      subject.add("testgroup", "testkey1", value: "testvalue1")
+    end
+
+    it "returns the value of a given credential" do
+      expect(subject.get("testkey0")).to eq("testvalue0")
+    end
+
+    it "returns the value of a given credential in a group" do
+      expect(subject.get("testgroup", "testkey1")).to eq("testvalue1")
+    end
+
+    it "raises an error if the credential isn't found" do
+      expect { subject.get("dne") }.to raise_error(Veil::CredentialNotFound)
+    end
+
+    it "raises an error if the group isn't found" do
+      expect { subject.get("dne", "tesetkey") }.to raise_error(Veil::GroupNotFound)
+    end
+
+    it "raises an error if the credential isn't found in the group" do
+      expect { subject.get("testgroup", "dne") }.to raise_error(Veil::CredentialNotFound)
+    end
+
+    it "raises an error if the wrong number of arguments are given" do
+      expect { subject.get("testgroup", "tesetkey", "whoops") }.to raise_error(ArgumentError)
+    end
+  end
+
   describe "#add" do
     it "creates a new credential" do
       subject.add("cowabunga")

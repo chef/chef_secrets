@@ -7,4 +7,6 @@ module Veil
   class MissingParameter < StandardError; end
   class NotImplmented < StandardError; end
   class InvalidCredentialHash < StandardError; end
+  class CredentialNotFound < StandardError; end
+  class GroupNotFound < StandardError; end
 end

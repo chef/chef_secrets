@@ -2,7 +2,6 @@
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "veil/version"
-require "find"
 
 Gem::Specification.new do |spec|
   spec.name          = "veil"
@@ -15,12 +14,12 @@ Gem::Specification.new do |spec|
   spec.license       = "Apache-2.0"
   spec.homepage      = "https://github.com/chef/chef-server/"
 
-  spec.files         = Find.find("./").select { |f| !File.directory?(f) }
+  spec.files         = Dir.glob("{bin,lib,spec}/**/*").reject { |f| File.directory?(f) } + ["LICENSE"]
   spec.executables   = spec.files.grep(/^bin/) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(/^(test|spec|features)/)
+  spec.test_files    = spec.files.grep(/^(spec|features)/)
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "bcrypt"
+  spec.add_dependency "bcrypt", "~> 3.1"
   spec.add_dependency "pbkdf2"
 
   spec.add_development_dependency "bundler"

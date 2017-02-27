@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     veil (0.1.0)
-      bcrypt
+      bcrypt (~> 3.1)
       pbkdf2
 
 GEM
@@ -60,4 +60,4 @@ DEPENDENCIES
   veil!
 
 BUNDLED WITH
-   1.11.2
+   1.13.6

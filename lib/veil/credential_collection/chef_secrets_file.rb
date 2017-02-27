@@ -1,6 +1,7 @@
 require "veil/credential_collection/base"
 require "fileutils"
 require "json"
+require "tempfile"
 
 module Veil
   class CredentialCollection
@@ -24,14 +25,16 @@ module Veil
         end
       end
 
-      attr_reader :path
+      attr_reader :path, :user, :group
 
       # Create a new ChefSecretsFile
       #
       # @param [Hash] opts
       #   a hash of options to pass to the constructor
       def initialize(opts = {})
-        @path = (opts[:path] && File.expand_path(opts[:path])) || "/etc/opscode/private-chef-secrets.json"
+        @path    = (opts[:path] && File.expand_path(opts[:path])) || "/etc/opscode/private-chef-secrets.json"
+        @user    = opts[:user]    || 'root'
+        @group   = opts[:group]   || 'root'
         @version = opts[:version] || 1
         super(opts)
       end
@@ -47,7 +50,14 @@ module Veil
       # Save the CredentialCollection to file
       def save
         FileUtils.mkdir_p(File.dirname(path)) unless File.directory?(File.dirname(path))
-        File.open(path, "w+") { |f| f.puts(JSON.pretty_generate(secrets_hash)) }
+
+        f = Tempfile.new("veil") # defaults to mode 0600
+        FileUtils.chown(user, group, f.path)
+        f.puts(JSON.pretty_generate(secrets_hash))
+        f.flush
+        f.close
+
+        FileUtils.mv(f.path, path)
         true
       end
 

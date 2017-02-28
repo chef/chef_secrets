@@ -69,11 +69,11 @@ module Veil
           group_name = args[0]
           cred_name = args[1]
 
-          g = credentials[args[0]]
+          g = credentials[group_name]
           if g.nil?
             raise Veil::GroupNotFound, "Credential group '#{group_name}' not found."
           else
-            c = g[args[1]]
+            c = g[cred_name]
             if c.nil?
               raise Veil::CredentialNotFound, "Credential '#{cred_name}' not found in group '#{group_name}'."
             else
@@ -83,6 +83,16 @@ module Veil
         else
           raise ArgumentError, "wrong number of arguments (given #{args.length}, expected 1 or 2)"
         end
+      end
+
+      #
+      # Check to see if a given credential has been added.
+      #
+      def exist?(*args)
+        get(*args)
+        true
+      rescue Veil::GroupNotFound, Veil::CredentialNotFound
+        false
       end
 
       # Add a new credential to the credentials

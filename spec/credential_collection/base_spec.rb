@@ -44,6 +44,7 @@ describe Veil::CredentialCollection::Base do
     end
   end
 
+
   describe "#get" do
     before do
       subject.add("testkey0", value: "testvalue0")
@@ -72,6 +73,17 @@ describe Veil::CredentialCollection::Base do
 
     it "raises an error if the wrong number of arguments are given" do
       expect { subject.get("testgroup", "tesetkey", "whoops") }.to raise_error(ArgumentError)
+    end
+  end
+
+  describe "#exist?" do
+    it "returns false if the key does not exist" do
+      expect(subject.exist?("Invalid Key")).to eq(false)
+    end
+
+    it "returns true if the key does exist" do
+      subject.add("testkey0", value: "testvalue0")
+      expect(subject.exist?("testkey0")).to eq(true)
     end
   end
 

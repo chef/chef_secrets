@@ -85,6 +85,9 @@ module Veil
         end
       end
 
+      # TODO mp 2017/03/01 replace usage to prefer get_credential
+      alias_method :get_credential, :get
+
       #
       # Check to see if a given credential has been added.
       #
@@ -94,6 +97,7 @@ module Veil
       rescue Veil::GroupNotFound, Veil::CredentialNotFound
         false
       end
+
 
       # Add a new credential to the credentials
       #
@@ -145,6 +149,23 @@ module Veil
         end
       end
       alias_method :<<, :add
+
+      # Add the contents of a file as a credential after
+      # verifying that the file can be read.
+      # Usage:
+      #   add_from_file(filename, "secretname")
+      #   add_from_file(filename, "groupname", "secretname")
+      #
+      #  Anything added from file will automatically be frozen.
+      #`add`'s options are not supported.
+      #
+      def add_from_file(filepath, *args)
+        unless File.readable?(filepath)
+          raise Veil::FileNotReadable.new("Cannot read #{filepath}")
+        end
+        add(*args, value: File.read(filepath),
+                   frozen: true)
+      end
 
       def remove(group_or_cred, cred = nil)
         if group_or_cred && cred && credentials.key?(group_or_cred)

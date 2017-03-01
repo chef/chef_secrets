@@ -44,7 +44,6 @@ describe Veil::CredentialCollection::Base do
     end
   end
 
-
   describe "#get" do
     before do
       subject.add("testkey0", value: "testvalue0")
@@ -87,6 +86,47 @@ describe Veil::CredentialCollection::Base do
     end
   end
 
+  describe "#add_from_file" do
+    context "when the file can be read" do
+      # using this as our input file lets us do less mocking of
+      # file sanity checks.
+      let (:input_file) { "/" }
+      let (:secret_content) { "a secret!" }
+
+      before do
+        allow(File).to receive(:read).with(input_file).and_return secret_content
+      end
+
+      context "with a name" do
+        it "adds the contents of the file as a credential" do
+          subject.add_from_file(input_file, "supersecret")
+          cred = subject["supersecret"]
+          expect(cred).to be_instance_of(Veil::Credential)
+          expect(cred.value).to eq secret_content
+          expect(cred.frozen).to be true
+        end
+      end
+
+      context "with a group and name" do
+        it "adds the contents of the file as a credential" do
+          subject.add_from_file(input_file, "super", "secret")
+          cred = subject["super"]["secret"]
+          expect(cred).to be_instance_of(Veil::Credential)
+          expect(cred.value).to eq secret_content
+          expect(cred.frozen).to be true
+        end
+      end
+    end
+
+    context "when the file can not be read" do
+      let (:input_file) { "/invalid" }
+
+      it "fails with a FileNotReadable error" do
+        expect { subject.add_from_file(input_file, "supersecret") }.to raise_error(Veil::FileNotReadable)
+      end
+    end
+  end
+
   describe "#add" do
     it "creates a new credential" do
       subject.add("cowabunga")
@@ -118,7 +158,7 @@ describe Veil::CredentialCollection::Base do
       end
     end
 
-    context "with a group, name, and lenth" do
+    context "with a group, name, and length" do
       it "creates a new credential the right group and name" do
         subject.add("my_db", "password", length: 15)
         expect(subject["my_db"]["password"]).to be_instance_of(Veil::Credential)

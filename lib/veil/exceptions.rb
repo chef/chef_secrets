@@ -9,4 +9,6 @@ module Veil
   class InvalidCredentialHash < StandardError; end
   class CredentialNotFound < StandardError; end
   class GroupNotFound < StandardError; end
+  class FileNotFound < StandardError; end
+  class FileNotReadable < StandardError; end
 end

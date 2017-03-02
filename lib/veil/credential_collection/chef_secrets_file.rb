@@ -7,13 +7,13 @@ module Veil
   class CredentialCollection
     class ChefSecretsFile < Base
       class << self
-        def from_file(path)
+        def from_file(path, opts = {})
           hash = JSON.parse(IO.read(path), symbolize_names: true)
 
           if hash.key?(:veil) && hash[:veil][:type] == "Veil::CredentialCollection::ChefSecretsFile"
-            creds = new(Veil::Utils.symbolize_keys(hash[:veil]))
+            creds = new(Veil::Utils.symbolize_keys(hash[:veil]).merge(opts))
           else
-            creds = new
+            creds = new(opts)
             creds.import_legacy_credentials(hash)
           end
 
@@ -33,8 +33,8 @@ module Veil
       #   a hash of options to pass to the constructor
       def initialize(opts = {})
         @path    = (opts[:path] && File.expand_path(opts[:path])) || "/etc/opscode/private-chef-secrets.json"
-        @user    = opts[:user]    || 'root'
-        @group   = opts[:group]   || 'root'
+        @user    = opts[:user]
+        @group   = opts[:group] || @user
         @version = opts[:version] || 1
         super(opts)
       end
@@ -52,7 +52,7 @@ module Veil
         FileUtils.mkdir_p(File.dirname(path)) unless File.directory?(File.dirname(path))
 
         f = Tempfile.new("veil") # defaults to mode 0600
-        FileUtils.chown(user, group, f.path)
+        FileUtils.chown(user, group, f.path) if user
         f.puts(JSON.pretty_generate(secrets_hash))
         f.flush
         f.close

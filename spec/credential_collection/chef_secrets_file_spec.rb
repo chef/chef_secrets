@@ -5,8 +5,8 @@ require 'stringio'
 describe Veil::CredentialCollection::ChefSecretsFile do
   let(:hasher) { Veil::Hasher.create }
   let!(:file) { Tempfile.new("private_chef_secrets.json") }
-  let(:user) {"opscode" }
-  let(:group) {"opscode" }
+  let(:user) { "opscode_user" }
+  let(:group) { "opscode_group" }
   let(:content) do
     {
       "veil" => {
@@ -27,8 +27,6 @@ describe Veil::CredentialCollection::ChefSecretsFile do
       }
     }
   end
-
-  subject { described_class.new(hasher: hasher.to_h, path: file.path) }
 
   describe "#self.from_file" do
     context "when the file exists" do
@@ -69,7 +67,6 @@ describe Veil::CredentialCollection::ChefSecretsFile do
 
   describe "#save" do
     it "saves the content to a machine loadable file" do
-      allow(FileUtils).to receive(:chown)
       file.rewind
       creds = described_class.new(path: file.path)
       creds.add("redis_lb", "password")
@@ -83,31 +80,51 @@ describe Veil::CredentialCollection::ChefSecretsFile do
       expect(new_creds["postgresql"]["sql_ro_password"].value).to eq(creds["postgresql"]["sql_ro_password"].value)
     end
 
-    let(:tmpfile) { StringIO.new }
+    context "when using ownership management" do
+      let(:tmpfile) do
+        s = StringIO.new
+        allow(s).to receive(:path).and_return("/tmp/unguessable")
+        s
+      end
 
-    it "gives the file proper permissions" do
-      expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
-      allow(tmpfile).to receive(:path).and_return("/tmp/unguessable")
-      expect(FileUtils).to receive(:chown).with("root", "root", "/tmp/unguessable")
-      expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
+      context "when the user is set" do
+        it "gives the file proper permissions" do
+          expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
+          expect(FileUtils).to receive(:chown).with(user, user, "/tmp/unguessable")
+          expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
 
-      creds = described_class.new(path: file.path)
-      creds.add("redis_lb", "password")
-      creds.save
-    end
+          creds = described_class.new(path: file.path,
+                                      user: user)
+          creds.add("redis_lb", "password")
+          creds.save
+        end
+      end
 
-    context "when user and group are set" do
-      it "gives the file proper permissions" do
-        expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
-        allow(tmpfile).to receive(:path).and_return("/tmp/unguessable")
-        expect(FileUtils).to receive(:chown).with(user, group, "/tmp/unguessable")
-        expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
+      context "when user and group are set" do
+        it "gives the file proper permissions" do
+          expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
+          expect(FileUtils).to receive(:chown).with(user, group, "/tmp/unguessable")
+          expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
 
-        creds = described_class.new(path: file.path,
-                                    user: user,
-                                    group: group)
-        creds.add("redis_lb", "password")
-        creds.save
+          creds = described_class.new(path: file.path,
+                                      user: user,
+                                      group: group)
+          creds.add("redis_lb", "password")
+          creds.save
+        end
+
+        it "gives the file proper permission even when called from_file" do
+          file.puts("{}"); file.rewind
+          expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
+          expect(FileUtils).to receive(:chown).with(user, group, "/tmp/unguessable")
+          expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
+
+          creds = described_class.from_file(file.path,
+                                            user: user,
+                                            group: group)
+          creds.add("redis_lb", "password")
+          creds.save
+        end
       end
     end
 

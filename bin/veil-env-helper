@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+
+require 'veil'
+require 'optparse'
+
+options = {
+  secrets_file: "/etc/opscode/private-chef-secrets.json"
+}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: veil-env-helper [options] COMMAND"
+
+  opts.on("--[no-]debug", "Emit diagnostic messages.  This will print secrets. Do not use this in production") do |d|
+    options[:debug] = d
+  end
+
+  opts.on("-s SECRETS_SPEC", "--secrets SECRETS_SPEC", "A comma seperated list of secrets to put in the environment") do |spec|
+    options[:secrets] = spec.split(",")
+  end
+
+  opts.on("-f SECRETS_FILE", "--secrets-file SECRETS_FILE", "Location of veil-managed secrets file. Default: /etc/opscode/private-chef-secrets.json") do |file|
+    options[:secrets_file] = file
+  end
+end.parse!
+
+def env_name_from_secret_spec(secret)
+  parts = secret.split("=")
+  case parts.length
+  when 1
+    ["CHEF_SECRET_#{parts[0].upcase}", parts[0]]
+  when 2
+    [parts[0].upcase, parts[1]]
+  else
+    raise "Bad secret spec: #{secret}"
+  end
+end
+
+veil = Veil::CredentialCollection::ChefSecretsFile.from_file(options[:secrets_file])
+Array(options[:secrets]).each do |secret|
+  env_name, secret_name = env_name_from_secret_spec(secret)
+  veil_args = secret_name.split(".")
+  secret_value = veil.get(*veil_args)
+  STDERR.puts "Setting #{env_name}=#{secret_value}" if options[:debug]
+  ENV[env_name] = secret_value
+end
+
+exec(*ARGV)

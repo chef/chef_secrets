@@ -7,6 +7,19 @@ options = {
   secrets_file: "/etc/opscode/private-chef-secrets.json"
 }
 
+# The command and its arguments will follow the -- delimiter:
+opt_args = []
+cmd_args = nil
+ARGV.each do |val|
+  if val == "--"
+    cmd_args = []
+  elsif cmd_args.nil?
+    opt_args << val
+  else
+    cmd_args << val
+  end
+end
+
 OptionParser.new do |opts|
   opts.banner = "Usage: veil-env-helper [options] COMMAND"
 
@@ -21,7 +34,7 @@ OptionParser.new do |opts|
   opts.on("-f SECRETS_FILE", "--secrets-file SECRETS_FILE", "Location of veil-managed secrets file. Default: /etc/opscode/private-chef-secrets.json") do |file|
     options[:secrets_file] = file
   end
-end.parse!
+end.parse(opt_args)
 
 def env_name_from_secret_spec(secret)
   parts = secret.split("=")
@@ -44,4 +57,4 @@ Array(options[:secrets]).each do |secret|
   ENV[env_name] = secret_value
 end
 
-exec(*ARGV)
+exec(*cmd_args)

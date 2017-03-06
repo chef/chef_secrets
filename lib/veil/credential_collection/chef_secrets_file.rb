@@ -8,20 +8,11 @@ module Veil
     class ChefSecretsFile < Base
       class << self
         def from_file(path, opts = {})
-          hash = JSON.parse(IO.read(path), symbolize_names: true)
-
-          if hash.key?(:veil) && hash[:veil][:type] == "Veil::CredentialCollection::ChefSecretsFile"
-            creds = new(Veil::Utils.symbolize_keys(hash[:veil]).merge(opts))
-          else
-            creds = new(opts)
-            creds.import_legacy_credentials(hash)
+          unless File.exists?(path)
+            raise InvalidCredentialCollectionFile.new("#{path} does not exist")
           end
 
-          creds.path = path
-          creds
-
-        rescue JSON::ParserError, Errno::ENOENT => e
-          raise InvalidCredentialCollectionFile.new("#{path} is not a valid credentials file:\n #{e.message}")
+          new(opts.merge(path: path))
         end
       end
 
@@ -32,11 +23,28 @@ module Veil
       # @param [Hash] opts
       #   a hash of options to pass to the constructor
       def initialize(opts = {})
-        @path    = (opts[:path] && File.expand_path(opts[:path])) || "/etc/opscode/private-chef-secrets.json"
+        @path = (opts[:path] && File.expand_path(opts[:path])) || "/etc/opscode/private-chef-secrets.json"
+
+        import_existing = File.exists?(path) && (File.size(path) != 0)
+
+        if import_existing
+          begin
+            hash = JSON.parse(IO.read(path), symbolize_names: true)
+          rescue JSON::ParserError, Errno::ENOENT => e
+            raise InvalidCredentialCollectionFile.new("#{path} is not a valid credentials file:\n #{e.message}")
+          end
+
+          if hash.key?(:veil) && hash[:veil][:type] == "Veil::CredentialCollection::ChefSecretsFile"
+            opts = Veil::Utils.symbolize_keys(hash[:veil]).merge(opts)
+          end
+        end
+
         @user    = opts[:user]
         @group   = opts[:group] || @user
         @version = opts[:version] || 1
         super(opts)
+
+        import_legacy_credentials(hash) if import_existing
       end
 
       # Set the secrets file path

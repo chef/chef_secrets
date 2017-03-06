@@ -26,6 +26,7 @@ module Veil
         @path = (opts[:path] && File.expand_path(opts[:path])) || "/etc/opscode/private-chef-secrets.json"
 
         import_existing = File.exists?(path) && (File.size(path) != 0)
+        legacy = true
 
         if import_existing
           begin
@@ -36,6 +37,7 @@ module Veil
 
           if hash.key?(:veil) && hash[:veil][:type] == "Veil::CredentialCollection::ChefSecretsFile"
             opts = Veil::Utils.symbolize_keys(hash[:veil]).merge(opts)
+            legacy = false
           end
         end
 
@@ -44,7 +46,7 @@ module Veil
         @version = opts[:version] || 1
         super(opts)
 
-        import_legacy_credentials(hash) if import_existing
+        import_legacy_credentials(hash) if import_existing && legacy
       end
 
       # Set the secrets file path

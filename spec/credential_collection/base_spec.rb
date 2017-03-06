@@ -190,7 +190,7 @@ describe Veil::CredentialCollection::Base do
       it "does not overwrite it" do
         subject.add("my_db", "password", length: 15)
         val = subject["my_db"]["password"].value
-        subject.add("my_db", "password")
+        subject.add("my_db", "password", value: "new-password")
         expect(subject["my_db"]["password"].value).to eq(val)
       end
 
@@ -198,6 +198,19 @@ describe Veil::CredentialCollection::Base do
         subject.add("my_db", "password", length: 15)
         my_db = subject["my_db"]["password"]
         expect(subject.add("my_db", "password")).to eq(my_db)
+      end
+
+      context "when force: true is given as param" do
+        it "does overwrite it" do
+          subject.add("my_db", "password", length: 15)
+          subject.add("my_db", "password", value: 'new-password', force: true)
+          expect(subject["my_db"]["password"].value).to eq("new-password")
+        end
+
+        it "returns the new credential" do
+          subject.add("my_db", "password", length: 15)
+          expect(subject.add("my_db", "password", value: "new-password", force: true).value).to eq('new-password')
+        end
       end
     end
   end

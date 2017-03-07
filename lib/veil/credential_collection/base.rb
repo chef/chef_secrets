@@ -128,25 +128,7 @@ module Veil
           raise ArgumentError, "wrong number of arguments (given #{args.length}, expected 1-3)"
         end
 
-        params[:name] = params[:name].to_s
-
-        if params[:value]
-          params[:length] = params[:value].length
-        else
-          params[:value] = hasher.encrypt(params[:group], params[:name], 0)
-        end
-
-        if params[:group]
-          credentials[params[:group]] ||= {}
-
-          return credentials[params[:group]][params[:name]] if credentials[params[:group]].key?(params[:name]) && !params[:force]
-
-          credentials[params[:group]][params[:name]] = Veil::Credential.new(params)
-        else
-          return credentials[params[:name]] if credentials.key?(params[:name]) && !params[:force]
-
-          credentials[params[:name]] = Veil::Credential.new(params)
-        end
+        add_from_params(params)
       end
       alias_method :<<, :add
 
@@ -192,6 +174,33 @@ module Veil
       end
 
       private
+
+      def add_from_params(params)
+        params[:name] = params[:name].to_s
+
+        if params[:value]
+          params[:length] = params[:value].length
+        else
+          params[:value] = hasher.encrypt(params[:group], params[:name], 0)
+        end
+
+        # Set frozen to true if force has been set and frozen hasn't otherwise been set
+        params[:frozen] ||= (params[:force] && params[:frozen].nil?)
+        v = Veil::Credential.new(params)
+
+        if params[:group]
+          credentials[params[:group]] ||= {}
+
+          return credentials[params[:group]][params[:name]] if credentials[params[:group]].key?(params[:name]) && !params[:force]
+
+          credentials[params[:group]][params[:name]] = v
+        else
+          return credentials[params[:name]] if credentials.key?(params[:name]) && !params[:force]
+
+          credentials[params[:name]] = v
+        end
+      end
+
 
       def expand_credentials_hash(creds_hash)
         expanded = Hash.new

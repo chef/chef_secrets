@@ -212,6 +212,35 @@ describe Veil::CredentialCollection::Base do
           expect(subject.add("my_db", "password", value: "new-password", force: true).value).to eq('new-password')
         end
       end
+
+      context "when force: true is given as param and :frozen is not" do
+        it "sets frozen to true" do
+          subject.add("my_db", "password", value: 'new-password', force: true)
+          expect(subject["my_db"]["password"].frozen).to eq(true)
+        end
+      end
+
+      context "when force: true is given as param and :frozen is false" do
+        it "sets frozen to false" do
+          subject.add("my_db", "password", value: 'new-password', force: true, frozen: false)
+          expect(subject["my_db"]["password"].frozen).to eq(false)
+        end
+      end
+
+      context "when force: false is given as param and :frozen is true" do
+        it "sets frozen to true" do
+          subject.add("my_db", "password", value: 'new-password', force: true, frozen: true)
+          expect(subject["my_db"]["password"].frozen).to eq(true)
+        end
+
+      end
+
+      context "when force: false is given as param and :frozen is false" do
+        it "sets frozen to false" do
+          subject.add("my_db", "password", value: 'new-password', force: true, frozen: false)
+          expect(subject["my_db"]["password"].frozen).to eq(false)
+        end
+      end
     end
   end
 

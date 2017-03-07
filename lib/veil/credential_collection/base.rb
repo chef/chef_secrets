@@ -104,7 +104,7 @@ module Veil
       # @param [Hash] args
       #
       def add(*args)
-        params = { name: nil, group: nil, length: 128, value: nil }
+        params = { name: nil, group: nil, length: 128, value: nil, force: false }
         case args.length
         when 1
           # add('foo')
@@ -139,11 +139,11 @@ module Veil
         if params[:group]
           credentials[params[:group]] ||= {}
 
-          return credentials[params[:group]][params[:name]] if credentials[params[:group]].key?(params[:name])
+          return credentials[params[:group]][params[:name]] if credentials[params[:group]].key?(params[:name]) && !params[:force]
 
           credentials[params[:group]][params[:name]] = Veil::Credential.new(params)
         else
-          return credentials[params[:name]] if credentials.key?(params[:name])
+          return credentials[params[:name]] if credentials.key?(params[:name]) && !params[:force]
 
           credentials[params[:name]] = Veil::Credential.new(params)
         end

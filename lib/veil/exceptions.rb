@@ -11,4 +11,5 @@ module Veil
   class GroupNotFound < StandardError; end
   class FileNotFound < StandardError; end
   class FileNotReadable < StandardError; end
+  class UnknownProvider < StandardError; end
 end

@@ -25,10 +25,11 @@ describe Veil::CredentialCollection::Base do
     context "with credential options" do
       it "builds the credentials" do
         subject.add("foo", "bar", length: 22)
-        creds_hash = subject.to_hash[:credentials]
+        creds_hash = subject["foo"]["bar"].to_hash
+        new_instance = described_class.new(credentials: { foo: { bar: creds_hash } })
 
-        new_instance = described_class.new(credentials: creds_hash)
-        expect(new_instance["foo"]["bar"].value).to eq(subject["foo"]["bar"].value)
+        expected = subject["foo"]["bar"].value
+        expect(new_instance["foo"]["bar"].value).to eq(expected)
       end
     end
 

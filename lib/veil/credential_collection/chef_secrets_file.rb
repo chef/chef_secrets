@@ -16,7 +16,9 @@ module Veil
         end
       end
 
-      attr_reader :path, :user, :group
+      CURRENT_VERSION = 2.freeze
+
+      attr_reader :path, :user, :group, :key
 
       # Create a new ChefSecretsFile
       #
@@ -43,7 +45,7 @@ module Veil
 
         @user    = opts[:user]
         @group   = opts[:group] || @user
-        @version = opts[:version] || 1
+        opts[:version] = CURRENT_VERSION
         super(opts)
 
         import_legacy_credentials(hash) if import_existing && legacy
@@ -57,9 +59,9 @@ module Veil
         @path = File.expand_path(path)
       end
 
-      # Save the CredentialCollection to file
+      # Save the CredentialCollection to file, encrypt it
       def save
-        FileUtils.mkdir_p(File.dirname(path)) unless File.directory?(File.dirname(path))
+        FileUtils.mkdir_p(File.dirname(path))
 
         f = Tempfile.new("veil") # defaults to mode 0600
         FileUtils.chown(user, group, f.path) if user
@@ -73,7 +75,7 @@ module Veil
 
       # Return the instance as a secrets style hash
       def secrets_hash
-        { "veil" => to_h }.merge(legacy_credentials_hash)
+        { "veil" => to_h }
       end
 
       # Return the credentials in a legacy chef secrets hash

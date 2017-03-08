@@ -1,5 +1,6 @@
-require "veil/hasher"
+require "veil/cipher"
 require "veil/credential"
+require "veil/hasher"
 require "forwardable"
 
 module Veil
@@ -13,13 +14,14 @@ module Veil
 
       extend Forwardable
 
-      attr_reader :credentials, :hasher, :version
+      attr_reader :credentials, :hasher, :version, :decryptor, :encryptor
 
       def_delegators :@credentials, :size, :length, :find, :map, :select, :each, :[], :keys
 
       def initialize(opts = {})
         @hasher = Veil::Hasher.create(opts[:hasher] || {})
-        @credentials = expand_credentials_hash(opts[:credentials] || {})
+        @decryptor, @encryptor = Veil::Cipher.create(opts[:cipher] || {})
+        @credentials = expand_credentials_hash(decryptor.decrypt(opts[:credentials]) || {})
         @version = opts[:version] || 1
       end
 
@@ -28,7 +30,8 @@ module Veil
           type: self.class.name,
           version: version,
           hasher: hasher.to_h,
-          credentials: credentials_as_hash
+          cipher: encryptor.to_h,
+          credentials: encryptor.encrypt(credentials_as_hash.to_json)
         }
       end
       alias_method :to_h, :to_hash

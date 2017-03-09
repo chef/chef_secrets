@@ -82,7 +82,7 @@ describe Veil::CredentialCollection::ChefSecretsFile do
       expect(new_creds["postgresql"]["sql_ro_password"].value).to eq(creds["postgresql"]["sql_ro_password"].value)
     end
 
-    it "saves the content to an encrypted" do
+    it "saves the content in an encrypted form" do
       creds = described_class.new(path: file.path)
       creds.add("postgresql", "sql_ro_password", value: "kneipenpathos")
       creds.save

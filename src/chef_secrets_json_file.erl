@@ -41,7 +41,7 @@ process_veil_ejson(_Unknown, _Ejson) ->
 
 decrypt_credentials(Ciphertext, Config) ->
     Key = base64:decode(ej:get([<<"key">>], Config)),
-    Iv = base64:decode(ej:get(["iv"], Config)),
+    Iv = base64:decode(ej:get([<<"iv">>], Config)),
     PlainText = crypto:block_decrypt(aes_cbc256, Key, Iv, base64:decode(Ciphertext)),
     jiffy:decode(unpad(PlainText)).
 

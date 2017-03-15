@@ -16,7 +16,9 @@ module Veil
         end
       end
 
-      attr_reader :path, :user, :group
+      CURRENT_VERSION = 2.freeze
+
+      attr_reader :path, :user, :group, :key
 
       # Create a new ChefSecretsFile
       #
@@ -43,7 +45,7 @@ module Veil
 
         @user    = opts[:user]
         @group   = opts[:group] || @user
-        @version = opts[:version] || 1
+        opts[:version] = CURRENT_VERSION
         super(opts)
 
         import_legacy_credentials(hash) if import_existing && legacy
@@ -57,9 +59,9 @@ module Veil
         @path = File.expand_path(path)
       end
 
-      # Save the CredentialCollection to file
+      # Save the CredentialCollection to file, encrypt it
       def save
-        FileUtils.mkdir_p(File.dirname(path)) unless File.directory?(File.dirname(path))
+        FileUtils.mkdir_p(File.dirname(path))
 
         f = Tempfile.new("veil") # defaults to mode 0600
         FileUtils.chown(user, group, f.path) if user
@@ -73,20 +75,24 @@ module Veil
 
       # Return the instance as a secrets style hash
       def secrets_hash
-        { "veil" => to_h }.merge(legacy_credentials_hash)
+        { "veil" => to_h }
       end
 
-      # Return the credentials in a legacy chef secrets hash
-      def legacy_credentials_hash
+      def credentials_for_export
         hash = Hash.new
 
-        to_h[:credentials].each do |namespace, creds|
-          hash[namespace] = {}
-          creds.each { |name, cred| hash[namespace][name] = cred[:value] }
+        credentials.each do |namespace, cred_or_creds|
+          if cred_or_creds.is_a?(Veil::Credential)
+            hash[namespace] = cred_or_creds.value
+          else
+            hash[namespace] = {}
+            cred_or_creds.each { |name, cred| hash[namespace][name] = cred.value }
+          end
         end
 
         hash
       end
+      alias_method :legacy_credentials_hash, :credentials_for_export
 
       def import_legacy_credentials(hash)
         hash.each do |namespace, creds_hash|

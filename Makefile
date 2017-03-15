@@ -1,4 +1,6 @@
 REBAR = $(CURDIR)/rebar3
 
 travis:
-	$(REBAR) do eunit, dialyzer
+	bundle install
+	PATH=bin/:$(PATH) bundle exec $(REBAR) do eunit, dialyzer
+	bundle exec rspec

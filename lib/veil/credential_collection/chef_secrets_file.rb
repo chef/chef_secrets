@@ -78,17 +78,21 @@ module Veil
         { "veil" => to_h }
       end
 
-      # Return the credentials in a legacy chef secrets hash
-      def legacy_credentials_hash
+      def credentials_for_export
         hash = Hash.new
 
-        to_h[:credentials].each do |namespace, creds|
-          hash[namespace] = {}
-          creds.each { |name, cred| hash[namespace][name] = cred[:value] }
+        credentials.each do |namespace, cred_or_creds|
+          if cred_or_creds.is_a?(Veil::Credential)
+            hash[namespace] = cred_or_creds.value
+          else
+            hash[namespace] = {}
+            cred_or_creds.each { |name, cred| hash[namespace][name] = cred.value }
+          end
         end
 
         hash
       end
+      alias_method :legacy_credentials_hash, :credentials_for_export
 
       def import_legacy_credentials(hash)
         hash.each do |namespace, creds_hash|

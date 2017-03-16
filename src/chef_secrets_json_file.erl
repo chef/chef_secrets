@@ -16,6 +16,7 @@ read(Config) ->
     SecretsFile = proplists:get_value(secrets_file, Config),
     lager:info("Reading secrets from ~s via veil helper command", [SecretsFile]),
     VeilHelperOutput = os:cmd(io_lib:format("veil-dump-secrets ~s", [SecretsFile])),
+    lager:info("output from helper: ~p", [VeilHelperOutput]),
     CredentialsHash = jiffy:decode(VeilHelperOutput),
     {ok, CredentialsHash}.
 

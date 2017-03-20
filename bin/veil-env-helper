@@ -7,7 +7,9 @@ require 'optparse'
 options = {
   secrets_file: "/etc/opscode/private-chef-secrets.json",
   pack: false,
-  debug: false
+  debug: false,
+  secrets: [],
+  optional_secrets: []
 }
 
 OptionParser.new do |opts|
@@ -21,8 +23,12 @@ OptionParser.new do |opts|
     options[:pack] = p
   end
 
-  opts.on("-s SECRETS_SPEC", "--secrets SECRETS_SPEC", "A comma seperated list of secrets to put in the environment") do |spec|
-    options[:secrets] = spec.split(",")
+  opts.on("-s SECRET_SPEC", "--secret SECRET_SPEC", "Secret to put in the environment") do |spec|
+    options[:secrets] << spec
+  end
+
+  opts.on("-m SECRET_SPEC", "--optional-secret SECRET_SPEC", "Optional secrets to put in the environment (if it exists)") do |spec|
+    options[:optional_secrets] << spec
   end
 
   opts.on("-f SECRETS_FILE", "--secrets-file SECRETS_FILE", "Location of veil-managed secrets file. Default: /etc/opscode/private-chef-secrets.json") do |file|
@@ -30,25 +36,38 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-def env_name_from_secret_spec(secret)
+def from_secret_spec(secret, start = {})
   parts = secret.split("=")
-  case parts.length
-  when 1
-    ["CHEF_SECRET_#{parts[0].upcase}", parts[0]]
-  when 2
-    [parts[0].upcase, parts[1]]
-  else
-    raise "Bad secret spec: #{secret}"
-  end
+  env_name, secret_name = case parts.length
+                          when 1
+                              ["CHEF_SECRET_#{parts[0].upcase}", parts[0]]
+                          when 2
+                              [parts[0].upcase, parts[1]]
+                          else
+                              raise "Bad secret spec: #{secret}"
+                          end
+
+  start.merge({ args: secret_name.split("."),
+                env_name: env_name,
+                name: secret_name })
 end
 
 veil = Veil::CredentialCollection::ChefSecretsFile.from_file(options[:secrets_file])
 packed_data = Hash.new()
 
-Array(options[:secrets]).each do |secret|
-  env_name, secret_name = env_name_from_secret_spec(secret)
-  veil_args = secret_name.split(".")
-  secret_value = veil.get(*veil_args)
+secrets = options[:secrets].map { |spec| from_secret_spec(spec) }
+secrets += options[:optional_secrets].map { |spec| from_secret_spec(spec, { optional: true }) }
+
+secrets.each do |secret|
+  veil_args = secret[:args]
+
+  begin
+    secret_value = veil.get(*veil_args)
+  rescue
+    raise unless secret[:optional]
+    next
+  end
+
   if options[:pack]
     STDERR.puts "Packing data using #{veil_args.inspect} and #{secret_value}" if options[:debug]
     if veil_args.length == 2
@@ -56,12 +75,12 @@ Array(options[:secrets]).each do |secret|
       packed_data[veil_args[0]][veil_args[1]] = secret_value
     elsif veil_args.length == 1
       packed_data[veil_args[0]] = secret_value
-    else
-      raise "Invalid secrets name: #{secret_name}"
+    elsif !secret[:optional]
+      raise "Invalid secrets name: #{secret[:name]}"
     end
   else
     STDERR.puts "Setting #{env_name}=#{secret_value}" if options[:debug]
-    ENV[env_name] = secret_value
+    ENV[secret[:env_name]] = secret_value
   end
 end
 

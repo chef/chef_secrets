@@ -1,10 +1,13 @@
 #!/usr/bin/env ruby
 
 require 'veil'
+require 'json'
 require 'optparse'
 
 options = {
-  secrets_file: "/etc/opscode/private-chef-secrets.json"
+  secrets_file: "/etc/opscode/private-chef-secrets.json",
+  pack: false,
+  debug: false
 }
 
 OptionParser.new do |opts|
@@ -12,6 +15,10 @@ OptionParser.new do |opts|
 
   opts.on("--[no-]debug", "Emit diagnostic messages.  This will print secrets. Do not use this in production") do |d|
     options[:debug] = d
+  end
+
+  opts.on("--pack", "Pass secrets in a single CHEF_SECRETS_DATA environment variable") do |p|
+    options[:pack] = p
   end
 
   opts.on("-s SECRETS_SPEC", "--secrets SECRETS_SPEC", "A comma seperated list of secrets to put in the environment") do |spec|
@@ -36,12 +43,30 @@ def env_name_from_secret_spec(secret)
 end
 
 veil = Veil::CredentialCollection::ChefSecretsFile.from_file(options[:secrets_file])
+packed_data = Hash.new()
+
 Array(options[:secrets]).each do |secret|
   env_name, secret_name = env_name_from_secret_spec(secret)
   veil_args = secret_name.split(".")
   secret_value = veil.get(*veil_args)
-  STDERR.puts "Setting #{env_name}=#{secret_value}" if options[:debug]
-  ENV[env_name] = secret_value
+  if options[:pack]
+    STDERR.puts "Packing data using #{veil_args.inspect} and #{secret_value}" if options[:debug]
+    if veil_args.length == 2
+      packed_data[veil_args[0]] ||= {}
+      packed_data[veil_args[0]][veil_args[1]] = secret_value
+    elsif veil_args.length == 1
+      packed_data[veil_args[0]] = secret_value
+    else
+      raise "Invalid secrets name: #{secret_name}"
+    end
+  else
+    STDERR.puts "Setting #{env_name}=#{secret_value}" if options[:debug]
+    ENV[env_name] = secret_value
+  end
+end
+
+if options[:pack]
+  ENV['CHEF_SECRETS_DATA'] = packed_data.to_json
 end
 
 exec(*ARGV)

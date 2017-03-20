@@ -1,5 +1,6 @@
 require "veil/credential_collection/base"
 require "veil/credential_collection/chef_secrets_file"
+require "veil/credential_collection/chef_secrets_env"
 
 module Veil
   class CredentialCollection
@@ -8,6 +9,8 @@ module Veil
       klass = case opts[:provider]
               when 'chef-secrets-file'
                 ChefSecretsFile
+              when 'chef-secrets-env'
+                ChefSecretsEnv
               else
                 raise UnknownProvider, "Unknown provider: #{opts[:provider]}"
               end

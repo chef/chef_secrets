@@ -48,7 +48,7 @@ module Veil
         opts[:version] = CURRENT_VERSION
         super(opts)
 
-        import_legacy_credentials(hash) if import_existing && legacy
+        import_credentials_hash(hash) if import_existing && legacy
       end
 
       # Set the secrets file path
@@ -76,35 +76,6 @@ module Veil
       # Return the instance as a secrets style hash
       def secrets_hash
         { "veil" => to_h }
-      end
-
-      def credentials_for_export
-        hash = Hash.new
-
-        credentials.each do |namespace, cred_or_creds|
-          if cred_or_creds.is_a?(Veil::Credential)
-            hash[namespace] = cred_or_creds.value
-          else
-            hash[namespace] = {}
-            cred_or_creds.each { |name, cred| hash[namespace][name] = cred.value }
-          end
-        end
-
-        hash
-      end
-      alias_method :legacy_credentials_hash, :credentials_for_export
-
-      def import_legacy_credentials(hash)
-        hash.each do |namespace, creds_hash|
-          credentials[namespace.to_s] ||= Hash.new
-          creds_hash.each do |cred, value|
-            credentials[namespace.to_s][cred.to_s] = Veil::Credential.new(
-              name: cred.to_s,
-              value: value,
-              length: value.length
-            )
-          end
-        end
       end
     end
   end

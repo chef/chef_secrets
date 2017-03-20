@@ -176,6 +176,39 @@ module Veil
         end
       end
 
+      def credentials_as_hash
+        hash = Hash.new
+
+        credentials.each do |cred_or_group_name, cred_or_group_attrs|
+          if cred_or_group_attrs.is_a?(Hash)
+            cred_or_group_attrs.each do |name, cred|
+              hash[cred_or_group_name] ||= Hash.new
+              hash[cred_or_group_name][name] = cred.to_hash
+            end
+          else
+            hash[cred_or_group_name] = cred_or_group_attrs.to_hash
+          end
+        end
+
+        hash
+      end
+
+      def credentials_for_export
+        hash = Hash.new
+
+        credentials.each do |namespace, cred_or_creds|
+          if cred_or_creds.is_a?(Veil::Credential)
+            hash[namespace] = cred_or_creds.value
+          else
+            hash[namespace] = {}
+            cred_or_creds.each { |name, cred| hash[namespace][name] = cred.value }
+          end
+        end
+
+        hash
+      end
+      alias_method :legacy_credentials_hash, :credentials_for_export
+
       private
 
       def add_from_params(params)
@@ -222,21 +255,17 @@ module Veil
         expanded
       end
 
-      def credentials_as_hash
-        hash = Hash.new
-
-        credentials.each do |cred_or_group_name, cred_or_group_attrs|
-          if cred_or_group_attrs.is_a?(Hash)
-            cred_or_group_attrs.each do |name, cred|
-              hash[cred_or_group_name] ||= Hash.new
-              hash[cred_or_group_name][name] = cred.to_hash
-            end
-          else
-            hash[cred_or_group_name] = cred_or_group_attrs.to_hash
+      def import_credentials_hash(hash)
+        hash.each do |namespace, creds_hash|
+          credentials[namespace.to_s] ||= Hash.new
+          creds_hash.each do |cred, value|
+            credentials[namespace.to_s][cred.to_s] = Veil::Credential.new(
+              name: cred.to_s,
+              value: value,
+              length: value.length
+            )
           end
         end
-
-        hash
       end
     end
   end

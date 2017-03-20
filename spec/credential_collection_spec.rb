@@ -11,6 +11,15 @@ describe Veil::CredentialCollection do
       end
     end
 
+    context 'passing provider "chef-secrets-env"' do
+      let(:opts) { { provider: 'chef-secrets-env' } }
+
+      it 'instantiates ChefSecretsFile with all options' do
+        expect(Veil::CredentialCollection::ChefSecretsEnv).to receive(:new).with(opts)
+        described_class.from_config(opts)
+      end
+    end
+
     context 'passing anything else as provider' do
       let(:opts) { { provider: 'vault' } }
 

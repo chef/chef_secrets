@@ -31,6 +31,16 @@ describe Veil::CredentialCollection::ChefSecretsEnv do
           expect(ENV[var_name]).to eq(nil)
         end
       end
+
+      context "env var content cannot be parsed" do
+        before(:each) do
+          ENV[var_name] = '{ "secre '
+        end
+
+        it "re-raises the JSON parse error" do
+          expect{ subject.get("secret_service", "secret_name") }.to raise_error(Veil::InvalidCredentialCollectionEnv)
+        end
+      end
     end
 
     context "env variable is not set" do

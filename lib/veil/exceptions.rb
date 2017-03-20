@@ -3,8 +3,9 @@ module Veil
   class InvalidSecret < StandardError; end
   class InvalidParameter < StandardError; end
   class InvalidHasher < StandardError; end
-  class InvalidCredentialCollectionFile < StandardError; end
-  class InvalidCredentialCollectionEnv < StandardError; end
+  class InvalidCredentialCollection < StandardError; end
+  class InvalidCredentialCollectionFile < InvalidCredentialCollection; end
+  class InvalidCredentialCollectionEnv <  InvalidCredentialCollection; end
   class MissingParameter < StandardError; end
   class NotImplmented < StandardError; end
   class InvalidCredentialHash < StandardError; end

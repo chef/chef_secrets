@@ -27,7 +27,7 @@ OptionParser.new do |opts|
     options[:secrets] << spec
   end
 
-  opts.on("-m SECRET_SPEC", "--optional-secret SECRET_SPEC", "Optional secrets to put in the environment (if it exists)") do |spec|
+  opts.on("-o SECRET_SPEC", "--optional-secret SECRET_SPEC", "Optional secrets to put in the environment (if it exists)") do |spec|
     options[:optional_secrets] << spec
   end
 

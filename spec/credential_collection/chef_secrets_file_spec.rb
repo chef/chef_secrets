@@ -97,43 +97,97 @@ describe Veil::CredentialCollection::ChefSecretsFile do
         s
       end
 
-      context "when the user is set" do
-        it "gives the file proper permissions" do
-          expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
-          expect(FileUtils).to receive(:chown).with(user, user, "/tmp/unguessable")
-          expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
+      context "when the target file does not exist" do
 
-          creds = described_class.new(path: file.path,
-                                      user: user)
-          creds.add("redis_lb", "password")
-          creds.save
+        let(:secrets_file) { double(File) }
+        before(:each) do
+          allow(File).to receive(:stat).with(file.path).and_raise(Errno::ENOENT)
+        end
+
+        context "when the user is not set" do
+          it "does not change any permissions" do
+            expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
+            expect(FileUtils).not_to receive(:chown)
+            expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
+
+            creds = described_class.new(path: file.path)
+            creds.add("redis_lb", "password")
+            creds.save
+          end
+        end
+
+        context "when the user is set" do
+          it "gives the file proper permissions" do
+            expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
+            expect(FileUtils).to receive(:chown).with(user, user, "/tmp/unguessable")
+            expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
+
+            creds = described_class.new(path: file.path,
+                                        user: user)
+            creds.add("redis_lb", "password")
+            creds.save
+          end
         end
       end
 
-      context "when user and group are set" do
-        it "gives the file proper permissions" do
-          expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
-          expect(FileUtils).to receive(:chown).with(user, group, "/tmp/unguessable")
-          expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
+      context "when the target file exists" do
 
-          creds = described_class.new(path: file.path,
-                                      user: user,
-                                      group: group)
-          creds.add("redis_lb", "password")
-          creds.save
+        let(:secrets_file) { double(File) }
+        let(:secrets_file_stat) { double(File, uid: 100, gid: 1000) }
+        before(:each) do
+          allow(File).to receive(:stat).with(file.path).and_return(secrets_file_stat)
         end
 
-        it "gives the file proper permission even when called from_file" do
-          file.puts("{}"); file.rewind
-          expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
-          expect(FileUtils).to receive(:chown).with(user, group, "/tmp/unguessable")
-          expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
+        context "when the user is not set" do
+          it "keeps the existing file permissions" do
+            expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
+            expect(FileUtils).to receive(:chown).with(100, 1000, "/tmp/unguessable")
+            expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
 
-          creds = described_class.from_file(file.path,
-                                            user: user,
-                                            group: group)
-          creds.add("redis_lb", "password")
-          creds.save
+            creds = described_class.new(path: file.path)
+            creds.add("redis_lb", "password")
+            creds.save
+          end
+        end
+
+        context "when the user is set" do
+          it "gives the file proper permissions" do
+            expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
+            expect(FileUtils).to receive(:chown).with(user, user, "/tmp/unguessable")
+            expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
+
+            creds = described_class.new(path: file.path,
+                                        user: user)
+            creds.add("redis_lb", "password")
+            creds.save
+          end
+        end
+
+        context "when user and group are set" do
+          it "gives the file proper permissions" do
+            expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
+            expect(FileUtils).to receive(:chown).with(user, group, "/tmp/unguessable")
+            expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
+
+            creds = described_class.new(path: file.path,
+                                        user: user,
+                                        group: group)
+            creds.add("redis_lb", "password")
+            creds.save
+          end
+
+          it "gives the file proper permission even when called from_file" do
+            file.puts("{}"); file.rewind
+            expect(Tempfile).to receive(:new).with("veil").and_return(tmpfile)
+            expect(FileUtils).to receive(:chown).with(user, group, "/tmp/unguessable")
+            expect(FileUtils).to receive(:mv).with("/tmp/unguessable", file.path)
+
+            creds = described_class.from_file(file.path,
+                                              user: user,
+                                              group: group)
+            creds.add("redis_lb", "password")
+            creds.save
+          end
         end
       end
     end

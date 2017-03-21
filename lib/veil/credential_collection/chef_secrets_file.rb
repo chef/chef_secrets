@@ -64,6 +64,12 @@ module Veil
         FileUtils.mkdir_p(File.dirname(path))
 
         f = Tempfile.new("veil") # defaults to mode 0600
+
+        if existing
+          @user  ||= existing.uid
+          @group ||= existing.gid
+        end
+
         FileUtils.chown(user, group, f.path) if user
         f.puts(JSON.pretty_generate(secrets_hash))
         f.flush
@@ -76,6 +82,12 @@ module Veil
       # Return the instance as a secrets style hash
       def secrets_hash
         { "veil" => to_h }
+      end
+
+      def existing
+        @existing ||= File.stat(path)
+      rescue Errno::ENOENT
+        nil
       end
     end
   end

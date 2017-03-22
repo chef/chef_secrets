@@ -5,10 +5,8 @@ branches:
 
 language: erlang
 otp_release:
-  - 19.1
+  - 19.3
   - 18.3
-  - 17.4
-  - R16B03-1
 install:
   - travis_retry rvm use 2.2.6 --install --binary --fuzzy
   - make install

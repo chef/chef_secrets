@@ -79,7 +79,7 @@ secrets.each do |secret|
       raise "Invalid secrets name: #{secret[:name]}"
     end
   else
-    STDERR.puts "Setting #{env_name}=#{secret_value}" if options[:debug]
+    STDERR.puts "Setting #{secret[:env_name]}=#{secret_value}" if options[:debug]
     ENV[secret[:env_name]] = secret_value
   end
 end

@@ -7,6 +7,7 @@ require 'optparse'
 options = {
   secrets_file: "/etc/opscode/private-chef-secrets.json",
   pack: false,
+  use_file: false,
   debug: false,
   secrets: [],
   optional_secrets: []
@@ -21,6 +22,10 @@ OptionParser.new do |opts|
 
   opts.on("--pack", "Pass secrets in a single CHEF_SECRETS_DATA environment variable") do |p|
     options[:pack] = p
+  end
+
+  opts.on("--use-file", "Pass secrets via a unlinked file available at the FD specified in CHEF_SECRETS_FD") do |fd|
+    options[:use_file] = fd
   end
 
   opts.on("-s SECRET_SPEC", "--secret SECRET_SPEC", "Secret to put in the environment") do |spec|
@@ -68,7 +73,7 @@ secrets.each do |secret|
     next
   end
 
-  if options[:pack]
+  if options[:pack] || options[:use_file]
     STDERR.puts "Packing data using #{veil_args.inspect} and #{secret_value}" if options[:debug]
     if veil_args.length == 2
       packed_data[veil_args[0]] ||= {}
@@ -84,8 +89,16 @@ secrets.each do |secret|
   end
 end
 
-if options[:pack]
+if options[:pack] && !options[:use_file]
   ENV['CHEF_SECRETS_DATA'] = packed_data.to_json
 end
 
-exec(*ARGV)
+if options[:use_file]
+  rd, wd = IO.pipe
+  wd.puts packed_data.to_json
+  wd.close
+  rd.close_on_exec = false
+  ENV['CHEF_SECRETS_FD'] = rd.to_i.to_s
+end
+
+exec(*ARGV, close_others: false)

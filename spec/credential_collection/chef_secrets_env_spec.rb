@@ -13,22 +13,12 @@ describe Veil::CredentialCollection::ChefSecretsEnv do
         expect(subject.get("secret_service", "secret_name")).to eq("secret_value")
       end
 
-      it 'removes the variable from env' do
-        subject
-        expect(ENV[var_name]).to eq(nil)
-      end
-
       context "env variable name is passed" do
         let(:var_name) { "CHEF_SECRETS_DATA_2" }
         let(:subject) { described_class.new(var_name: var_name) }
 
         it 'reads the secret from the passed env var name' do
           expect(subject.get("secret_service", "secret_name")).to eq("secret_value")
-        end
-
-        it 'removes the variable from env' do
-          subject
-          expect(ENV[var_name]).to eq(nil)
         end
       end
 

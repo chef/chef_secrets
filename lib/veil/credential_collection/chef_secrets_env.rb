@@ -37,8 +37,6 @@ module Veil
           msg = "Env var #{var_name} could not be parsed: #{e.message}"
           raise InvalidCredentialCollectionEnv.new(msg)
         end
-      ensure
-        ENV.delete(var_name)
       end
     end
   end

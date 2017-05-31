@@ -3,13 +3,14 @@
          get/1,
          get/2]).
 
--type secret() :: ej:json_term().
+-type secret_value() :: ej:json_term().
+-type secret()       :: binary().
 
--spec get(binary()) -> {ok, secret()} | {error, any()}.
+-spec get(binary()) -> {ok, secret_value()} | {error, not_found}.
 get(ServiceName) ->
     chef_secrets_keyring:get(ServiceName).
 
--spec get(binary(), binary()) -> {ok, secret()} | {error, any()}.
+-spec get(binary(), binary()) -> {ok, secret()} | {error, not_found}.
 get(ServiceName, ItemName) ->
     case chef_secrets_keyring:get(ServiceName) of
         {ok, ServiceData} ->

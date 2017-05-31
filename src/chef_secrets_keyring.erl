@@ -27,9 +27,11 @@
 start_link(Config) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, Config, []).
 
+-spec get(binary()) -> {ok, ej:json_term()} | {error, not_found}.
 get(Name) when is_binary(Name) ->
     gen_server:call(?MODULE, {get, Name}).
 
+-spec dump() -> ej:json_object().
 dump() ->
     gen_server:call(?MODULE, dump).
 

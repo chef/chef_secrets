@@ -11,4 +11,8 @@
 -spec config({binary(), binary()}) -> proplists:proplist().
 config({Section, Keyname}) ->
     {ok, Password} = chef_secrets:get(Section, Keyname),
-    [{pass, Password} | sqerl_config_env:config()].
+    %% We set the env here because applications that use chef-secrets
+    %% often don't set a password field in the sqerl config, but sqerl
+    %% expects it to be there. We should probably fix that at some point
+    application:set_env(sqerl, db_pass, Password),
+    sqerl_config_env:config().

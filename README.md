@@ -1,8 +1,8 @@
 # Veil
 
 Veil is a library for securely creating, storing, and rotating Chef
-Server secrets. Prior to Veil, Chef Server secrets we're generated
-on the bootstrap backend node and we're long lived for the duration
+Server secrets. Prior to Veil, Chef Server secrets were generated
+on the bootstrap backend node and were long lived for the duration
 of the Chef Server install. The secrets generated were completely
 random so there was no way to add a new service or credential without
 copying the secrets file between each Chef Server in the cluster.

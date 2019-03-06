@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{Veil is a Ruby Gem for generating secure secrets from a shared secret}
   spec.description   = spec.summary
   spec.license       = "Apache-2.0"
-  spec.homepage      = "https://github.com/chef/chef-server/"
+  spec.homepage      = "https://github.com/chef/chef_secrets/"
 
   spec.files         = Dir.glob("{bin,lib,spec}/**/*").reject { |f| File.directory?(f) } + ["LICENSE"]
   spec.executables   = spec.files.grep(/^bin/) { |f| File.basename(f) }

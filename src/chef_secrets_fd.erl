@@ -5,6 +5,7 @@
 %%% @end
 %%%-------------------------------------------------------------------
 -module(chef_secrets_fd).
+-include_lib("eunit/include/eunit.hrl").
 
 -export([read/1]).
 
@@ -17,6 +18,9 @@ read(_Config) ->
             Fd = erlang:list_to_integer(Value),
             lager:info("Reading secrets from file descriptor ~B", [Fd]),
             {ok, Content} = read_content(Fd),
+            io:format(user, "Content:~p~n", [Content]),
+?debugFmt("Content ~p", [Content]),
+
             {ok, jiffy:decode(Content)}
     end.
 

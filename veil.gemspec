@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = "veil"
   spec.version       = Veil::VERSION
   spec.authors       = ["Chef Software, Inc."]
-  spec.email         = ["partnereng@chef.io"]
+  spec.email         = ["info@chef.io"]
 
   spec.summary       = %q{Veil is a Ruby Gem for generating secure secrets from a shared secret}
   spec.description   = spec.summary
@@ -16,13 +16,12 @@ Gem::Specification.new do |spec|
 
   spec.files         = Dir.glob("{bin,lib,spec}/**/*").reject { |f| File.directory?(f) } + ["LICENSE"]
   spec.executables   = spec.files.grep(/^bin/) { |f| File.basename(f) }.reject { |f| %w(setup console).include?(f) }
-  spec.test_files    = spec.files.grep(/^(spec|features)/)
+  spec.test_files    = spec.files.grep(/^spec/)
   spec.require_paths = ["lib"]
 
   spec.add_dependency "bcrypt", "~> 3.1"
   spec.add_dependency "pbkdf2"
 
-  spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec", "~> 3.0"
 end

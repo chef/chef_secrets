@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/chef/chef_secrets/"
 
   spec.files         = Dir.glob("{bin,lib,spec}/**/*").reject { |f| File.directory?(f) } + ["LICENSE"]
-  spec.executables   = spec.files.grep(/^bin/) { |f| File.basename(f) }
+  spec.executables   = spec.files.grep(/^bin/) { |f| File.basename(f) }.reject { |f| %w(setup console).include?(f) }
   spec.test_files    = spec.files.grep(/^(spec|features)/)
   spec.require_paths = ["lib"]
 

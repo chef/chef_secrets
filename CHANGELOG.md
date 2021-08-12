@@ -1,16 +1,17 @@
 # veil (chef\_secrets) ChangeLog
 
-<!-- latest_release 0.3.6 -->
-## [0.3.6](https://github.com/chef/chef_secrets/tree/0.3.6) (2021-08-12)
+<!-- latest_release 0.3.7 -->
+## [0.3.7](https://github.com/chef/chef_secrets/tree/0.3.7) (2021-08-12)
 
 #### Merged Pull Requests
-- Use chef/ej, not seth/ej [#62](https://github.com/chef/chef_secrets/pull/62) ([lbakerchef](https://github.com/lbakerchef))
+- Update ej dep from using &#39;branch&#39; to &#39;ref&#39; [#70](https://github.com/chef/chef_secrets/pull/70) ([marcparadise](https://github.com/marcparadise))
 <!-- latest_release -->
 
 <!-- release_rollup since=0.3.5 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- Update ej dep from using &#39;branch&#39; to &#39;ref&#39; [#70](https://github.com/chef/chef_secrets/pull/70) ([marcparadise](https://github.com/marcparadise)) <!-- 0.3.7 -->
 - Use chef/ej, not seth/ej [#62](https://github.com/chef/chef_secrets/pull/62) ([lbakerchef](https://github.com/lbakerchef)) <!-- 0.3.6 -->
 <!-- release_rollup -->
 

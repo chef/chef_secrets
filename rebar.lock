@@ -1,6 +1,6 @@
 [{<<"ej">>,
   {git,"https://github.com/chef/ej.git",
-       {branch,"f843f4da1cb7d8d2414adccc37fe523e3f92d789"}},
+       {ref,"f843f4da1cb7d8d2414adccc37fe523e3f92d789"}},
   0},
  {<<"goldrush">>,
   {git,"https://github.com/basho/goldrush.git",

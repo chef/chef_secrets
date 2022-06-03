@@ -3,10 +3,14 @@
 <!-- latest_release -->
 <!-- latest_release -->
 
-<!-- release_rollup -->
+<!-- release_rollup since=0.3.10 -->
+### Changes not yet released to rubygems.org
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
+## [0.3.10](https://github.com/chef/chef_secrets/tree/0.3.10) (2022-06-03)
+<!-- latest_stable_release -->
+
 ## [0.3.10](https://github.com/chef/chef_secrets/tree/0.3.10) (2022-06-01)
 
 #### Merged Pull Requests
@@ -20,7 +24,6 @@
 - Update ej dep from using &#39;branch&#39; to &#39;ref&#39; [#70](https://github.com/chef/chef_secrets/pull/70) ([marcparadise](https://github.com/marcparadise))
 - Revert ej dep [#71](https://github.com/chef/chef_secrets/pull/71) ([marcparadise](https://github.com/marcparadise))
 - reinstate changes from #70 [#72](https://github.com/chef/chef_secrets/pull/72) ([marcparadise](https://github.com/marcparadise))
-<!-- latest_stable_release -->
 
 ## [0.3.5](https://github.com/chef/chef_secrets/tree/0.3.5) (2021-07-15)
 

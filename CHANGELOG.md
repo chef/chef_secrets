@@ -7,6 +7,12 @@
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
+## [0.3.10](https://github.com/chef/chef_secrets/tree/0.3.10) (2022-06-01)
+
+#### Merged Pull Requests
+- workload promote/merge no longer supported. Switch to subscription [#74](https://github.com/chef/chef_secrets/pull/74) ([marcparadise](https://github.com/marcparadise))
+- Update to Erlang 24.x [#73](https://github.com/chef/chef_secrets/pull/73) ([lbakerchef](https://github.com/lbakerchef))
+
 ## [0.3.9](https://github.com/chef/chef_secrets/tree/0.3.9) (2021-08-25)
 
 #### Merged Pull Requests

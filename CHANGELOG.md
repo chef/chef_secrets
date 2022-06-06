@@ -8,8 +8,10 @@
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
-## [0.3.10](https://github.com/chef/chef_secrets/tree/0.3.10) (2022-06-03)
+## [0.3.10](https://github.com/chef/chef_secrets/tree/0.3.10) (2022-06-06)
 <!-- latest_stable_release -->
+
+## [0.3.10](https://github.com/chef/chef_secrets/tree/0.3.10) (2022-06-03)
 
 ## [0.3.10](https://github.com/chef/chef_secrets/tree/0.3.10) (2022-06-01)
 

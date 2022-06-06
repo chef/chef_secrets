@@ -1,10 +1,17 @@
 # veil (chef\_secrets) ChangeLog
 
-<!-- latest_release -->
+<!-- latest_release 0.3.11 -->
+## [0.3.11](https://github.com/chef/chef_secrets/tree/0.3.11) (2022-06-06)
+
+#### Merged Pull Requests
+- Dummy change [#78](https://github.com/chef/chef_secrets/pull/78) ([mimaslanka](https://github.com/mimaslanka))
 <!-- latest_release -->
 
 <!-- release_rollup since=0.3.10 -->
 ### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Dummy change [#78](https://github.com/chef/chef_secrets/pull/78) ([mimaslanka](https://github.com/mimaslanka)) <!-- 0.3.11 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->

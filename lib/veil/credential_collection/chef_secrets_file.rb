@@ -8,7 +8,7 @@ module Veil
     class ChefSecretsFile < Base
       class << self
         def from_file(path, opts = {})
-          unless File.exists?(path)
+          unless File.exist?(path)
             raise InvalidCredentialCollectionFile.new("#{path} does not exist")
           end
 
@@ -27,7 +27,7 @@ module Veil
       def initialize(opts = {})
         @path = (opts[:path] && File.expand_path(opts[:path])) || "/etc/opscode/private-chef-secrets.json"
 
-        import_existing = File.exists?(path) && (File.size(path) != 0)
+        import_existing = File.exist?(path) && (File.size(path) != 0)
         legacy = true
 
         if import_existing

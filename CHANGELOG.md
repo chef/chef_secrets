@@ -1,9 +1,17 @@
 # veil (chef\_secrets) ChangeLog
 
-<!-- latest_release -->
+<!-- latest_release 0.3.12 -->
+## [0.3.12](https://github.com/chef/chef_secrets/tree/0.3.12) (2024-11-13)
+
+#### Merged Pull Requests
+- remove deprecated exists? for exist? [#81](https://github.com/chef/chef_secrets/pull/81) ([Stromweld](https://github.com/Stromweld))
 <!-- latest_release -->
 
-<!-- release_rollup -->
+<!-- release_rollup since=0.3.11 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- remove deprecated exists? for exist? [#81](https://github.com/chef/chef_secrets/pull/81) ([Stromweld](https://github.com/Stromweld)) <!-- 0.3.12 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->

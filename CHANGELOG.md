@@ -1,16 +1,17 @@
 # veil (chef\_secrets) ChangeLog
 
-<!-- latest_release 0.3.13 -->
-## [0.3.13](https://github.com/chef/chef_secrets/tree/0.3.13) (2025-02-12)
+<!-- latest_release 0.3.14 -->
+## [0.3.14](https://github.com/chef/chef_secrets/tree/0.3.14) (2025-07-25)
 
 #### Merged Pull Requests
-- Fix for TLS verify_ca verify mode - PR #110 solution [#82](https://github.com/chef/chef_secrets/pull/82) ([jashaik](https://github.com/jashaik))
+- point to modified ej [#80](https://github.com/chef/chef_secrets/pull/80) ([lbakerchef](https://github.com/lbakerchef))
 <!-- latest_release -->
 
 <!-- release_rollup since=0.3.11 -->
 ### Changes not yet released to rubygems.org
 
 #### Merged Pull Requests
+- point to modified ej [#80](https://github.com/chef/chef_secrets/pull/80) ([lbakerchef](https://github.com/lbakerchef)) <!-- 0.3.14 -->
 - Fix for TLS verify_ca verify mode - PR #110 solution [#82](https://github.com/chef/chef_secrets/pull/82) ([jashaik](https://github.com/jashaik)) <!-- 0.3.13 -->
 - remove deprecated exists? for exist? [#81](https://github.com/chef/chef_secrets/pull/81) ([Stromweld](https://github.com/Stromweld)) <!-- 0.3.12 -->
 <!-- release_rollup -->

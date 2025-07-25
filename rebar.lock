@@ -1,7 +1,7 @@
 {"1.2.0",
 [{<<"ej">>,
   {git,"https://github.com/chef/ej",
-       {branch,"CHEF-11677/CHEF-12498/lbaker"}},
+	{ref,"f0425c1b8894acddb6e687fe3acbc9c1eafbd3e0"}},
   0},
  {<<"goldrush">>,{pkg,<<"goldrush">>,<<"0.1.9">>},1},
  {<<"jiffy">>,

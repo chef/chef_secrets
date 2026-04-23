@@ -166,3 +166,7 @@ redistribute /etc/opscode/private-chef-secrets.json:
   Please copy /etc/opscode/private-chef-secrets.json to each Chef Server and
   run 'chef-server-ctl reconfigure'
   ```
+  
+# Copyright
+
+See [COPYRIGHT.md](./COPYRIGHT.md).

@@ -6,16 +6,18 @@
 %%%-------------------------------------------------------------------
 -module(chef_secrets_fd).
 
+-include_lib("kernel/include/logger.hrl").
+
 -export([read/1]).
 
 read(_Config) ->
     case os:getenv("CHEF_SECRETS_FD") of
         false ->
-            lager:error("Could not find CHEF_SECRETS_FD in environment", []),
+            ?LOG_ERROR("Could not find CHEF_SECRETS_FD in environment", []),
             {error, env_var_not_found};
         Value ->
             Fd = erlang:list_to_integer(Value),
-            lager:info("Reading secrets from file descriptor ~B", [Fd]),
+            ?LOG_INFO("Reading secrets from file descriptor ~B", [Fd]),
             {ok, Content} = read_content(Fd),
             {ok, jiffy:decode(Content)}
     end.
@@ -32,6 +34,6 @@ gather_data(Port, Acc) ->
         {Port, {data, Data}} ->
             gather_data(Port, [Data | Acc])
     after 2000 ->
-        lager:error("timed out reading from fd"),
+        ?LOG_ERROR("timed out reading from fd"),
         {error, timeout}
     end.

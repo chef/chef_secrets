@@ -6,6 +6,8 @@
 %%%-------------------------------------------------------------------
 -module(chef_secrets_keyring).
 
+-include_lib("kernel/include/logger.hrl").
+
 -behaviour(gen_server).
 
 %% API
@@ -47,7 +49,7 @@ init(Config) ->
 handle_call({get, Name}, _From, #state{secrets_data = Secrets} = State) ->
     Reply = case ej:get([Name], Secrets) of
               undefined ->
-                lager:warning("Could not find secret ~s", [Name]),
+                ?LOG_WARNING("Could not find secret ~s", [Name]),
                 {error, not_found};
               Secret ->
                 {ok, Secret}
